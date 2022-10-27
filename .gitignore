@@ -1,0 +1,8 @@
+My Clippings.txt
+*.pyc
+*.txt
+clips.json
+.DS_Store
+data.json
+temp.txt
+node_modules
