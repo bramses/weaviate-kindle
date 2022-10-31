@@ -42,7 +42,6 @@ def get_clip(section):
         author = author.group(1)
     else:
         author = "Unknown"
-    
 
     clip['position'] = position
     clip['content'] = lines[2]
@@ -63,7 +62,7 @@ def export_txt(clips):
 
         filename = os.path.join(OUTPUT_DIR, u"%s.md" % book)
         with open(filename, 'wb') as f:
-            print ("Exporting to %s" % filename)
+            print("Exporting to %s" % filename)
             f.write(b'\n\n---\n\n'.join(lines))
 
 
@@ -83,9 +82,24 @@ def save_clips(clips):
     Save new clips to DATA_FILE
     """
     with open(DATA_FILE, 'w') as f:
-        print ("Saving to %s" % DATA_FILE)
+        print("Saving to %s" % DATA_FILE)
         json.dump(clips, f, indent=4)
 
+
+def convert_clips(clips):
+    clippings = []
+    for bookName in clips:
+        for clip in clips[bookName]:
+            new_clip = {}
+            new_clip['author'] = clip['author']
+            new_clip['clippingText'] = clip['content']
+            new_clip['bookTitle'] = clip['book']
+            new_clip['location'] = clip['position']
+            new_clip['dateAdded'] = clip['date']
+
+            clippings.append(new_clip)
+    
+    return clippings
 
 def main():
     # load old clips
@@ -99,9 +113,9 @@ def main():
         clip = get_clip(section)
 
         if TEST_SECTION:
-            print (section)
-            print (clip)
-            print ("---")
+            print(section)
+            print(clip)
+            print("---")
             TEST_SECTION = False
 
         if not clip:
@@ -118,9 +132,11 @@ def main():
     # remove key with empty value
     clips = {k: v for k, v in clips.items() if v}
 
-    print (clips['San Fransicko (Shellenberger, Michael)'])
+    converted_clips = convert_clips(clips)
+    clippings_json = { "clippings": converted_clips }
+
     # save/export clips
-    save_clips(clips)
+    save_clips(clippings_json)
     # export_txt(clips)
 
 
