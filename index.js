@@ -10,10 +10,29 @@ const client = weaviate.client({
   host: "localhost:8080",
 });
 
+
+function generateClippingObject (clipping) {
+  const obj = {
+    class: "Clipping",
+    id: uuidv5(clipping.clippingText, UUID_NAMESPACE),
+    properties: {
+      bookTitle: clipping.bookTitle,
+      author: clipping.author,
+      clippingText: clipping.clippingText,
+        date: clipping.date,
+        location: clipping.location,
+        dateAdded: clipping.dateAdded
+    }
+}
+
+  return obj;
+}
+
 async function getJsonData() {
   const file = JSON.parse(fs.readFileSync("data.json", "utf8"));
   return file;
 }
+
 
 async function importClippings() {
   // Get the data from the data.json file
@@ -25,15 +44,7 @@ async function importClippings() {
 
   data.clippings.forEach((clipping) => {
     // Construct an object with a class, id, properties and vector
-    const obj = {
-      class: "Clipping",
-      id: uuidv5(clipping.text, UUID_NAMESPACE),
-      properties: {
-        bookTitle: clipping.bookTitle,
-        author: clipping.author,
-        clippingText: clipping.clippingText,
-      },
-    };
+    const obj = generateClippingObject(clipping);
 
     // add the object to the batch queue
     batcher = batcher.withObject(obj);
@@ -93,7 +104,7 @@ var deleteSchema = async function (className) {
 };
 
 var setSchema = async function () {
-  // await deleteSchema("Clipping"); // uncomment to delete the class
+  await deleteSchema("Clipping"); // uncomment to delete the class
 
   var classObj = {
     class: "Clipping",
@@ -108,6 +119,28 @@ var setSchema = async function () {
         dataType: ["string"],
         description: "The name of the Author",
         name: "author",
+      },
+      {
+        dataType: ["string"],
+        description: "The location of the clipping",
+        name: "location",
+        moduleConfig: {
+          "text2vec-transformers": {
+            skip: true,
+            vectorizePropertyName: false,
+          },
+        },
+      },
+      {
+        dataType: ["string"],
+        description: "The date the clipping was added",
+        name: "dateAdded",
+        moduleConfig: {
+          "text2vec-transformers": {
+            skip: true,
+            vectorizePropertyName: false,
+          },
+        },
       },
       {
         dataType: ["text"],
@@ -151,5 +184,6 @@ var getSchema = async function () {
     });
 };
 
+// getSchema();
+// setSchema();
 // importClippings();
-getSchema();

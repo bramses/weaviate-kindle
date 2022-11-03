@@ -1,5 +1,7 @@
 // checking that id comes up every time for the same object
 const { v4: uuidv4, v5: uuidv5 } = require("uuid");
+var fs = require("fs");
+
 
 const UUID_NAMESPACE = "83b39495-6acb-44ac-b59e-bf9200158bfe";
 
@@ -31,6 +33,15 @@ const generateID = (clipping) => {
 const obj1 = generateID(clipping);
 const obj2 = generateID(clipping);
 
-console.log(obj1);
-console.log(obj2);
+// console.log(obj1);
+// console.log(obj2);
 
+
+async function getJsonDataLen() {
+    const file = JSON.parse(fs.readFileSync("data.json", "utf8"));
+    return file.clippings.length;
+}
+
+getJsonDataLen().then((res) => {
+    console.log(res);
+}) 
